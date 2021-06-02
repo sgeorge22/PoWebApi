@@ -16,9 +16,22 @@ namespace PoWebApi.Controllers
     {
         private readonly PoContext _context;
 
+
         public EmployeesController(PoContext context)
         {
             _context = context;
+        }
+
+        //GET: api/Employees/sgeorge/password
+        [HttpGet("{login}/{password}")]
+        public async Task<ActionResult<Employee>> Login(string login, string password)
+        {
+            var empl = await _context.Employee.SingleOrDefaultAsync(e => e.Login == login && e.Password == password);
+            if(empl == null)
+            {
+                return NotFound();
+            }
+            return empl;
         }
 
         // GET: api/Employees
