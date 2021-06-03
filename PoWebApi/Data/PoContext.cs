@@ -16,6 +16,7 @@ namespace PoWebApi.Data
 
         public DbSet<Employee> Employee { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+        public DbSet<Item> Items { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Employee>(e =>
