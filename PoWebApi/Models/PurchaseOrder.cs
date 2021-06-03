@@ -9,11 +9,17 @@ namespace PoWebApi.Models
 {
     public class PurchaseOrder
     {
+        public static string StatusNew = "NEW";
+        public static string StatusEdit = "EDIT";
+        public static string StatusReview = "REVIEW";
+        public static string StatusApprove = "APPROVED";
+        public static string StatusRejected = "REJECTED";
+
         public int Id { get; set; }
         [Required, StringLength(30)]
         public string Description { get; set; } // why is the user putting in the order
         [Required, StringLength(20)]
-        public string Status { get; set; } = "NEW"; // info not input by the user but updated through the application (program code), default new
+        public string Status { get; set; } = PurchaseOrder.StatusNew; // info not input by the user but updated through the application (program code), default new
         [Column(TypeName = "decimal(9,2)")] // this is communicating that column is a decimal and the 9 is total digits and 2 is how many digits come after .
         //TypeName is used to communicate to SQL
         public decimal Total { get; set; } = 0;// grand total of all items added to the purchase order, default to 0

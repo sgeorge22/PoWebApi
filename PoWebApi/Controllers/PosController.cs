@@ -61,6 +61,21 @@ namespace PoWebApi.Controllers
 
             return purchaseOrder;
         }
+
+        [HttpGet("{status}")]
+        public async Task<ActionResult<IEnumerable<PurchaseOrder>>> GetPoUnderReview(string status)
+        {
+            var purchaseReview = await _context.PurchaseOrders
+                .Where(x => x.Status == PurchaseOrder.StatusReview)
+                .Include(p => p.Employee)
+                .ToListAsync();
+            return purchaseReview;
+            
+        }
+
+
+
+
         [HttpPut("{id}/edit")]
         public async Task<IActionResult> PutPoToEdit(int id)
         {
@@ -83,6 +98,8 @@ namespace PoWebApi.Controllers
             {
                 return NotFound();
             }
+            
+            
             po.Status = (po.Total <= 100 && po.Total > 0) ? "APPROVED" : "REVIEW";
 
             return await PutPurchaseOrder(id, po);
