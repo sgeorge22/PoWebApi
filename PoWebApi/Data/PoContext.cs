@@ -15,6 +15,7 @@ namespace PoWebApi.Data
         }
 
         public DbSet<Employee> Employee { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Employee>(e =>
@@ -22,5 +23,8 @@ namespace PoWebApi.Data
                 e.HasIndex(p => p.Login).IsUnique();
             });
         }
+
+        
+
     }
 }
