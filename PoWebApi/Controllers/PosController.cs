@@ -25,14 +25,18 @@ namespace PoWebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PurchaseOrder>>> GetPurchaseOrders()
         {
-            return await _context.PurchaseOrders.ToListAsync();
+            return await _context.PurchaseOrders
+                .Include(x => x.Employee)
+                .ToListAsync();
         }
 
         // GET: api/Pos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PurchaseOrder>> GetPurchaseOrder(int id)
         {
-            var purchaseOrder = await _context.PurchaseOrders.FindAsync(id);
+            var purchaseOrder = await _context.PurchaseOrders
+                
+                .SingleOrDefaultAsync(x => x.Id == id);
 
             if (purchaseOrder == null)
             {
@@ -41,6 +45,50 @@ namespace PoWebApi.Controllers
 
             return purchaseOrder;
         }
+        //the below code is doing the same thing as the above but has the Include so that it can include in the getbypk the employee as well
+        // GET: api/Pos/5/empl
+        [HttpGet("{id}/empl")]
+        public async Task<ActionResult<PurchaseOrder>> GetPurchaseOrderandEmpl(int id)
+        {
+            var purchaseOrder = await _context.PurchaseOrders
+                .Include(x => x.Employee)
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+            if (purchaseOrder == null)
+            {
+                return NotFound();
+            }
+
+            return purchaseOrder;
+        }
+        [HttpPut("{id}/edit")]
+        public async Task<IActionResult> PutPoToEdit(int id)
+        {
+            var po = await _context.PurchaseOrders.FindAsync(id);
+            if(po == null)
+            {
+                return NotFound();
+            }
+            po.Status = "EDIT";
+           
+
+            return await PutPurchaseOrder(id, po);
+        }
+
+        [HttpPut("{id}/review")]
+        public async Task<IActionResult> PutPoToReviewOrApprove(int id)
+        {
+            var po = await _context.PurchaseOrders.FindAsync(id);
+            if(po == null)
+            {
+                return NotFound();
+            }
+            po.Status = (po.Total <= 100 && po.Total > 0) ? "APPROVED" : "REVIEW";
+
+            return await PutPurchaseOrder(id, po);
+
+        }
+
 
         // PUT: api/Pos/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
