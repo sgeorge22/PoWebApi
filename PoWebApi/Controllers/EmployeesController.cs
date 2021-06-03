@@ -66,13 +66,14 @@ namespace PoWebApi.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(employee).State = EntityState.Modified;
+            _context.Entry(employee).State = EntityState.Modified;//manipulates the casche and keeps track of the state of the data and allows for modification
+            //takes the data you take in and treats it as read and updates it 
 
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException)//exception class - means the update and change was already pushed and you need to read the data and do the modification again
             {
                 if (!EmployeeExists(id))
                 {
@@ -93,10 +94,10 @@ namespace PoWebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
         {
-            _context.Employee.Add(employee);
-            await _context.SaveChangesAsync();
+            _context.Employee.Add(employee); //dont need the await here as its just uploading into a casche
+            await _context.SaveChangesAsync();//await instead goes here as it then will communicate the change into the database
 
-            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
+            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);//CreatedAtAction is a function that creates the response 
         }
 
         // DELETE: api/Employees/5
