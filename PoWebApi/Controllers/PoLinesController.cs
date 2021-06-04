@@ -21,6 +21,21 @@ namespace PoWebApi.Controllers
             _context = context;
         }
 
+       //Below code is joining tables and getting totals
+        private async Task RecalculatePoTotal(int poid)
+        {
+            var po = await _context.PurchaseOrders.FindAsync(poid); //the po that we pass in has to already be in the database
+            if (po == null) throw new Exception("FATAL: Po is not found to recalc!");
+            var poTotal = (from l in _context.PoLines//query syntax start
+                    join i in _context.Items
+                    on l.ItemId equals i.Id
+                    where l.PurchaseOrderId == poid
+                    select new { LineTotal = l.Quanity * i.Price }).Sum(x => x.LineTotal);//end
+            po.Total = poTotal;
+            await _context.SaveChangesAsync();
+           
+            
+        }
       
 
         // GET: api/PoLines
@@ -60,6 +75,7 @@ namespace PoWebApi.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                await RecalculatePoTotal(poLine.PurchaseOrderId);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -84,6 +100,7 @@ namespace PoWebApi.Controllers
         {
             _context.PoLine.Add(poLine);
             await _context.SaveChangesAsync();
+            await RecalculatePoTotal(poLine.PurchaseOrderId);
 
             return CreatedAtAction("GetPoLine", new { id = poLine.Id }, poLine);
         }
@@ -100,6 +117,7 @@ namespace PoWebApi.Controllers
 
             _context.PoLine.Remove(poLine);
             await _context.SaveChangesAsync();
+            await RecalculatePoTotal(poLine.PurchaseOrderId);
 
             return poLine;
         }
